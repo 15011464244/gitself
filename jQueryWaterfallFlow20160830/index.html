@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh">
+	<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>jQuery响应式Pinterest样式无限动态加载图片瀑布流特效</title>
+	<style>
+* { margin: 0; }
+.jq22-container { margin-top: 50px; }
+#div1 { margin: auto; position: relative; }
+.box { float: left; padding: 0px; border: 1px solid #ccc; background: #f7f7f7; box-shadow: 0 0 8px #ccc; }
+.box:hover { box-shadow: 0 0 10px #999; }
+.box img { width: 150px; }
+</style>
+	<!--[if IE]>
+		<script src="http://libs.baidu.com/html5shiv/3.7/html5shiv.min.js"></script>
+	<![endif]-->
+	</head>
+	<body>
+  <div class="jq22-container">
+      <div class="jq22-content bgcolor-3">
+       <div id="div1">
+          <div class="box"><img src="http:\/\/api.seqier.com\/public\/thumb\/2016-10-02\/1475435494-200x.jpg" alt=""></div>
+        </div>
+        <div style="height: 1000px"></div>
+      </div>  
+  </div>
+<script src="js/jquery.js"></script> 
+<script src="js/jquery.waterfall.js"></script> 
+<script>
+var page = 1;
+var pre_page = 100;
+	$("#div1").waterfall({
+	    itemClass: ".box",
+	    minColCount: 2,
+	    spacingHeight: 10,
+	    resizeable: true,
+	    ajaxCallback: function(success, end) {
+       $.ajax({
+          url:"ui.php",
+          data:{page:page,pre_page:pre_page},
+          success:function(data){
+            page++;
+            var data = JSON.parse(data);
+              console.log(data.showapi_res_body);
+              data = data.showapi_res_body.data;
+               var str = "";
+              var templ = '<div class="box" style="opacity:0;filter:alpha(opacity=0);height:{{height}}"><div class="pic"><img src="{{src}}" /></div></div>'
+
+              for(var i = 0; i < data.length; i++) {
+                  str += templ.replace("{{src}}", data[i].imgurl);
+              // }
+              // for(var i =0;i<data.length;i++){
+                var imgtemp = new Image();//创建一个image对象
+                imgtemp.src = data[i].imgurl;
+                imgtemp.index = i;//指定一个检索值，用于确定是哪张图
+                // imgtemp.onload = function(){//图片加载完成后执行
+                //   var _stemp = this;//将当前指针复制给新的变量，不然会导致变量共用
+                //   realWidth = this.width;
+                //   realHeight = this.height;
+                //   console.log(realHeight);
+                  // str += templ.replace("{{height}}", imgtemp.height+"px");
+                  // if(realWidth >=_w )
+                  // {
+                  //   Imgarray[_stemp.index].style.width = _w+'px';
+                  //   Imgarray[_stemp.index].style.height = 'auto';
+                  // }
+                  // else{
+                  //   Imgarray[_stemp.index].style.width = realWidth+'px';
+                  //   Imgarray[_stemp.index].style.height = realHeight+'px';
+                  // }
+                 
+                    
+                  // }
+                }
+                 $(str).appendTo($("#div1"));
+                   success();
+                    end();
+          }
+         });
+	       
+	    }
+	});
+	</script>
+</body>
+</html>
